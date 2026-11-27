@@ -150,11 +150,11 @@ function getErrorMessage(error: unknown): string {
 
 function Sidebar() {
   const navigation = [
-    { label: "Dashboard", icon: LayoutDashboard },
-    { label: "Transactions", icon: ArrowLeftRight },
-    { label: "Budgets", icon: Wallet },
-    { label: "Analytics", icon: ChartNoAxesCombined },
-    { label: "Savings Goals", icon: Target },
+    { label: "Dashboard", href: "/", icon: LayoutDashboard },
+    { label: "Transactions", href: "/transactions", icon: ArrowLeftRight },
+    { label: "Budgets", href: "/budgets", icon: Wallet },
+    { label: "Analytics", href: "/analytics", icon: ChartNoAxesCombined },
+    { label: "Savings Goals", href: "/savings", icon: Target },
   ];
 
   return (
@@ -186,7 +186,7 @@ function Sidebar() {
           return (
             <a
               key={item.label}
-              href="#"
+              href={item.href}
               className={`flex items-center gap-3 rounded-xl px-4 py-3 text-sm ${
                 index === 0
                   ? "bg-violet-600 text-white"

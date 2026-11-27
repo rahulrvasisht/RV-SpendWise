@@ -1,0 +1,41 @@
+
+> spendwise@0.1.0 build
+> next build
+
+▲ Next.js 16.4.6 (Turbopack)
+- Environments: .env.local
+✓ Running next.config.ts took 16ms
+- Cache Components enabled
+- Partial Prefetching enabled
+
+  Creating an optimized production build ...
+✓ Compiled successfully in 294ms
+  Running TypeScript ...
+  Finished TypeScript in 1185ms ...
+  Collecting page data using 10 workers ...
+  Generating static pages using 10 workers (0/9) ...
+  Generating static pages using 10 workers (2/9) 
+Error: Route "/analytics": Next.js encountered the unstable value `new Date()` in a Client Component.
+
+This value would be evaluated during the prerender, instead of recomputed on each visit.
+
+Ways to fix this:
+  - [stream] Wrap the Client Component in `<Suspense fallback={...}>`
+  - [defer] Move the read into a `useEffect` or event handler
+  - [measure] If the value is for telemetry, use a timing API such as `performance.now()`
+
+Learn more: https://nextjs.org/docs/messages/blocking-prerender-current-time-client
+    at <unknown> (src/app/analytics/page.tsx:162:17)
+  160 |   const [error, setError] = useState("");
+  161 |
+> 162 |   const today = new Date();
+      |                 ^
+  163 |   const todayString = localDateString(today);
+  164 |   const currentMonthStart = monthStartString(today);
+  165 |
+To get a more detailed stack trace and pinpoint the issue, try one of the following:
+  - Start the app in development mode by running `next dev`, then open "/analytics" in your browser to investigate the error.
+  - Rerun the production build with `next build --debug-prerender` to generate better stack traces.
+Error occurred prerendering page "/analytics". Read more: https://nextjs.org/docs/messages/prerender-error
+Export encountered an error on /analytics/page: /analytics, exiting the build.
+⨯ Next.js build worker exited with code: 1 and signal: null
