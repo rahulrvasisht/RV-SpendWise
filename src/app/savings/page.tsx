@@ -114,6 +114,7 @@ export default function SavingsPage() {
   const [recurringPlans, setRecurringPlans] = useState<RecurringPlan[]>([]);
 
   const [userId, setUserId] = useState("");
+  const [today, setToday] = useState("");
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
@@ -129,16 +130,24 @@ export default function SavingsPage() {
   const [goalForm, setGoalForm] = useState<GoalForm>(initialGoalForm);
   const [contributionAmount, setContributionAmount] = useState("");
   const [contributionNote, setContributionNote] = useState("");
-  const [contributionDate, setContributionDate] = useState(todayString());
+  const [contributionDate, setContributionDate] = useState("");
 
   const [recurringAmount, setRecurringAmount] = useState("");
   const [recurringFrequency, setRecurringFrequency] = useState<
     "weekly" | "monthly"
   >("monthly");
-  const [recurringDate, setRecurringDate] = useState(todayString());
+  const [recurringDate, setRecurringDate] = useState("");
 
   const [calculatorGoal, setCalculatorGoal] = useState("");
   const [calculatorAmount, setCalculatorAmount] = useState("");
+
+  // Read the current date after hydration so it is not evaluated during prerendering.
+  useEffect(() => {
+    const currentDate = todayString();
+    setToday(currentDate);
+    setContributionDate(currentDate);
+    setRecurringDate(currentDate);
+  }, []);
 
   const notify = (message: string, isError = false) => {
     if (isError) {
@@ -755,6 +764,8 @@ export default function SavingsPage() {
   const insights = useMemo(() => {
     const items: { title: string; description: string }[] = [];
 
+    if (!today) return items;
+
     if (goals.length === 0) {
       items.push({
         title: "Start your savings journey",
@@ -790,9 +801,7 @@ export default function SavingsPage() {
 
     const duePlans = recurringPlans.filter(
       (plan) =>
-        plan.is_active &&
-        plan.reminder_enabled &&
-        plan.next_due_date <= todayString(),
+        plan.is_active && plan.reminder_enabled && plan.next_due_date <= today,
     );
 
     if (duePlans.length > 0) {
@@ -814,7 +823,7 @@ export default function SavingsPage() {
         1,
         Math.ceil(
           (new Date(`${goal.target_date}T00:00:00`).getTime() -
-            new Date(`${todayString()}T00:00:00`).getTime()) /
+            new Date(`${today}T00:00:00`).getTime()) /
             86400000,
         ),
       );
@@ -861,19 +870,20 @@ export default function SavingsPage() {
     completedGoals,
     activeGoals,
     savedByGoal,
+    today,
   ]);
 
   const calculatorResult = useMemo(() => {
     const goal = goals.find((item) => item.id === calculatorGoal);
 
-    if (!goal || !goal.target_date) return null;
+    if (!today || !goal || !goal.target_date) return null;
 
     const remaining = getRemaining(goal);
     const days = Math.max(
       1,
       Math.ceil(
         (new Date(`${goal.target_date}T00:00:00`).getTime() -
-          new Date(`${todayString()}T00:00:00`).getTime()) /
+          new Date(`${today}T00:00:00`).getTime()) /
           86400000,
       ),
     );
@@ -889,12 +899,12 @@ export default function SavingsPage() {
       canReach: enteredMonthly > 0 && enteredMonthly * months >= remaining,
       days,
     };
-  }, [calculatorGoal, calculatorAmount, goals, contributions]);
+  }, [calculatorGoal, calculatorAmount, goals, contributions, today]);
 
   const milestoneList = [25, 50, 75, 100];
 
   const duePlans = recurringPlans.filter(
-    (plan) => plan.is_active && plan.next_due_date <= todayString(),
+    (plan) => plan.is_active && plan.next_due_date <= today,
   );
 
   const completedContributionCount = contributions.length;
@@ -1704,7 +1714,7 @@ export default function SavingsPage() {
             <FormField label="Target date">
               <input
                 type="date"
-                min={todayString()}
+                min={today}
                 value={goalForm.target_date}
                 onChange={(e) =>
                   setGoalForm({ ...goalForm, target_date: e.target.value })
@@ -1804,7 +1814,7 @@ export default function SavingsPage() {
               <input
                 required
                 type="date"
-                max={todayString()}
+                max={today}
                 value={contributionDate}
                 onChange={(e) => setContributionDate(e.target.value)}
                 className="form-input"
@@ -1883,7 +1893,7 @@ export default function SavingsPage() {
               <input
                 required
                 type="date"
-                min={todayString()}
+                min={today}
                 value={recurringDate}
                 onChange={(e) => setRecurringDate(e.target.value)}
                 className="form-input"

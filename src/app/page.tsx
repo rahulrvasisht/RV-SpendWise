@@ -345,7 +345,7 @@ export default function Home() {
   const [description, setDescription] = useState("");
   const [amount, setAmount] = useState("");
   const [category, setCategory] = useState("Food & Dining");
-  const [date, setDate] = useState(getTodayDate());
+  const [date, setDate] = useState("");
   const [selectedLabelIds, setSelectedLabelIds] = useState<string[]>([]);
   const [isSaving, setIsSaving] = useState(false);
 
@@ -363,6 +363,12 @@ export default function Home() {
 
   // Reset
   const [isResetting, setIsResetting] = useState(false);
+
+  // Set the current date after the component mounts in the browser.
+  // This avoids calling new Date() during Next.js prerendering.
+  useEffect(() => {
+    setDate(getTodayDate());
+  }, []);
 
   // ---------------- LOAD DATA ----------------
 

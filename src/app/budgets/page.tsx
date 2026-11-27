@@ -95,7 +95,7 @@ export default function BudgetsPage() {
   const router = useRouter();
   const supabase = useMemo(() => createClient(), []);
 
-  const [selectedMonth, setSelectedMonth] = useState(getCurrentMonth());
+  const [selectedMonth, setSelectedMonth] = useState("");
   const [budgets, setBudgets] = useState<Budget[]>([]);
   const [expenses, setExpenses] = useState<Expense[]>([]);
 
@@ -110,24 +110,38 @@ export default function BudgetsPage() {
 
   const [customCategory, setCustomCategory] = useState(false);
 
-  const monthStart = getMonthStart(selectedMonth);
-  const nextMonth = getMonthStart(
-    (() => {
-      const [year, month] = selectedMonth.split("-").map(Number);
-      const date = new Date(year, month, 1);
-      return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}`;
-    })(),
-  );
+  // Read the current date only after the component mounts in the browser.
+  useEffect(() => {
+    setSelectedMonth(getCurrentMonth());
+  }, []);
 
-  const previousMonth = getMonthStart(getPreviousMonth(selectedMonth));
+  const monthStart = selectedMonth ? getMonthStart(selectedMonth) : "";
+  const nextMonth = selectedMonth
+    ? getMonthStart(
+        (() => {
+          const [year, month] = selectedMonth.split("-").map(Number);
+          const date = new Date(year, month, 1);
+          return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}`;
+        })(),
+      )
+    : "";
 
-  const previousMonthLabel = formatMonth(getPreviousMonth(selectedMonth));
-
-  const currentMonthLabel = formatMonth(selectedMonth);
+  const previousMonthValue = selectedMonth
+    ? getPreviousMonth(selectedMonth)
+    : "";
+  const previousMonth = previousMonthValue
+    ? getMonthStart(previousMonthValue)
+    : "";
+  const previousMonthLabel = previousMonthValue
+    ? formatMonth(previousMonthValue)
+    : "";
+  const currentMonthLabel = selectedMonth ? formatMonth(selectedMonth) : "";
 
   /* LOAD BUDGETS AND EXPENSES */
 
   const loadData = useCallback(async () => {
+    if (!monthStart) return;
+
     setLoading(true);
     setError("");
 
