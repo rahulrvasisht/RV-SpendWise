@@ -1,6 +1,4 @@
-cat > (src / lib / supabase / server.ts) << "EOF";-
 import { createServerClient } from "@supabase/ssr";
-import { EOF } from "dns/promises";
 import { cookies } from "next/headers";
 
 export async function createClient() {
@@ -32,4 +30,3 @@ export async function createClient() {
     },
   });
 }
-EOF;
